@@ -1,3 +1,5 @@
+# Derek Ling's rep
+
 import pygame
 from pygame.locals import *
 import random
