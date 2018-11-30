@@ -23,6 +23,7 @@ clock = pygame.time.Clock()
 FPS = 40  # frames per sec
 
 FONT = pygame.font.Font(None, 32)
+BUTTON_FONT = pygame.font.Font(None, 45)
 
 craft_img = pygame.image.load(os.path.join(RES, "craft.png"))  # load -> pygame.Surface instance
 enemy_img = pygame.image.load(os.path.join(RES, "enemy.png"))
@@ -34,6 +35,25 @@ class GameObj(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         GameObj.family.add(self)
+
+
+class Button(GameObj):
+
+    all = pygame.sprite.Group()
+
+    def __init__(self, text, centerx, centery):
+        super().__init__()
+        self.text = text
+        bit_map = BUTTON_FONT.render(text, True, BLACK)
+        text_rect = bit_map.get_rect()
+        surf_size = [val + 10 for val in bit_map.get_size()]
+        self.image = pygame.Surface(surf_size)
+        self.rect = self.image.get_rect()
+        self.image.fill(WHITE)
+        pygame.draw.rect(self.image, BLACK, self.rect, 3)
+        text_rect.center = [int(val / 2) for val in self.image.get_size()]
+        self.image.blit(bit_map, text_rect)
+        self.rect.center = (centerx, centery)
 
 
 class Player(GameObj):
@@ -181,6 +201,8 @@ def main():
     Enemy()
     Enemy()
     Enemy()
+
+    Button("HELLO WORLD", 300, 300)
 
     loop = True
     while loop:
