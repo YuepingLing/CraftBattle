@@ -1,9 +1,7 @@
-# Derek Ling's rep
-
 import pygame
 from pygame.locals import *
 import random
-
+import os
 
 # constants
 WHITE = (255, 255, 255)
@@ -11,21 +9,26 @@ BLACK = (0, 0, 0)
 ORANGE = (255, 153, 0)
 BLUE = (0, 102, 255)
 
+RES = os.path.join(os.path.dirname(os.path.realpath(__file__)), "res")
+# __name__ == "__main__"
+
 # pygame display set up
 pygame.init()
 
-WIDTH, HEIGHT = 580, 720 # soft code
+WIDTH, HEIGHT = 580, 720  # soft code
 display = pygame.display.set_mode((WIDTH, HEIGHT))
 # display = pygame.display.set_mode((960, 800))
 
 clock = pygame.time.Clock()
-FPS = 40 # frames per sec
+FPS = 40  # frames per sec
 
 FONT = pygame.font.Font(None, 32)
 
+craft_img = pygame.image.load(os.path.join(RES, "craft.png"))  # load -> pygame.Surface instance
+enemy_img = pygame.image.load(os.path.join(RES, "enemy.png"))
+
 
 class GameObj(pygame.sprite.Sprite):
-
     family = pygame.sprite.RenderUpdates()
 
     def __init__(self):
@@ -37,7 +40,7 @@ class Player(GameObj):
     WIDTH = 50
     HEIGHT = 50
     SPEED = 8
-    FIRE_RATE = 10
+    FIRE_RATE = 8
 
     score = 0
 
@@ -45,9 +48,8 @@ class Player(GameObj):
 
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((Player.WIDTH, Player.HEIGHT)) # what to draw
-        self.image.fill(BLACK)
-        self.rect = self.image.get_rect() # where to draw
+        self.image = craft_img
+        self.rect = self.image.get_rect()  # where to draw
         self.rect.bottom = HEIGHT
         self.rect.centerx = WIDTH / 2
         self.x, self.y = self.rect.center
@@ -75,8 +77,6 @@ class Player(GameObj):
         self._fire_timer -= 1
 
         # enemy crash
-
-
         if pygame.sprite.spritecollide(self, Enemy.family, False):
             self.kill()
 
@@ -94,9 +94,8 @@ class Enemy(GameObj):
 
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((Enemy.WIDTH, Enemy.HEIGHT))
-        self.image.fill(BLUE)
-        self.rect = self.image.get_rect() # pygame.Rect(0, 0, w, h)
+        self.image = enemy_img
+        self.rect = self.image.get_rect()  # pygame.Rect(0, 0, w, h)
         self.rect.bottom = 0
         self.rect.left = random.randint(0, WIDTH - Enemy.WIDTH)
         Enemy.family.add(self)
@@ -119,14 +118,14 @@ class Bullet(GameObj):
 
     family = pygame.sprite.Group()
 
-    def __init__(self, x, y, dir=-1):
+    def __init__(self, x, y, facing=-1):
         super().__init__()
         self.image = pygame.Surface((Bullet.WIDTH, Bullet.LENGTH))
         self.image.fill(ORANGE)
         self.rect = self.image.get_rect()
         self.x, self.y = x, y
         self.rect.center = x, y
-        self.speed = dir * Bullet.SPEED
+        self.speed = facing * Bullet.SPEED
         Bullet.family.add(self)
 
     def update(self):
@@ -136,13 +135,13 @@ class Bullet(GameObj):
             self.kill()
 
 
-def label(display, text, x, y, color=BLACK):
-    bit_map = FONT.render(text, True, color)
+def label(surface, text, x, y, text_color=BLACK):
+    bit_map = FONT.render(text, True, text_color)
     rect = bit_map.get_rect()
     rect.topleft = (x, y)
     if x < 0 or y < 0:
         rect.center = (WIDTH / 2, HEIGHT / 2)
-    display.blit(bit_map, rect)
+    surface.blit(bit_map, rect)
 
 
 def retry():
@@ -209,6 +208,7 @@ def main():
         pygame.display.flip()
 
         clock.tick(FPS)
+
 
 def quit_all():
     pygame.quit()
